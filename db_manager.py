@@ -1,13 +1,10 @@
 import os
 import json
 import logging
-from datetime import date, timedelta, datetime
-from zoneinfo import ZoneInfo
-
-COL_TZ = ZoneInfo('America/Bogota')
+from datetime import date, timedelta, datetime, timezone
 
 def _today():
-    return datetime.now(COL_TZ).date()
+    return (datetime.now(timezone.utc) - timedelta(hours=5)).date()
 
 try:
     import psycopg2
