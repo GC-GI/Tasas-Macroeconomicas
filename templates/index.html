@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indicadores Macroeconómicos Colombia | Integrity CF</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-graph-up-arrow"></i>
+                Indicadores Macro Integrity CF
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="/">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="document.getElementById('variables-section').scrollIntoView({behavior:'smooth'})">Variables</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="document.getElementById('noticias-section').scrollIntoView({behavior:'smooth'})">Noticias</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" id="download-excel"><i class="bi bi-download"></i> Descargar Excel</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1>Indicadores Macroeconómicos</h1>
+                    <p class="lead">Monitoreo diario de las principales variables económicas de Colombia</p>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <span class="hero-stat-label">Última actualización</span>
+                            <span class="hero-stat-value" id="last-update">--</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-label">TRM Hoy</span>
+                            <span class="hero-stat-value text-warning" id="hero-trm">--</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="hero-icon">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                    <button class="btn btn-light btn-lg mt-3" onclick="refreshData()">
+                        <i class="bi bi-arrow-clockwise"></i> Actualizar ahora
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="variables-section" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Variables Macroeconómicas</h2>
+                <p>Datos actualizados diariamente desde fuentes oficiales</p>
+            </div>
+            <div class="row g-4" id="variables-container">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Cargando indicadores...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section bg-light">
+        <div class="container">
+            <div class="section-header">
+                <h2>IBR - Cotizaciones Participantes</h2>
+                <p>Indicador Bancario de Referencia por plazo y entidad</p>
+            </div>
+            <div class="row g-4" id="ibr-container">
+                <div class="col-12 text-center py-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>TCO - Subasta TES Corto Plazo</h2>
+                <p>Tasas de corte por moneda (pesos/UVR) y plazo</p>
+            </div>
+            <div class="row g-4" id="tco-container">
+                <div class="col-12 text-center py-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section bg-light">
+        <div class="container">
+            <div class="section-header">
+                <h2>CDTs - Tasas de Captación</h2>
+                <p>Tasas de interés para captaciones a 90, 180 y 360 días</p>
+            </div>
+            <div class="row g-4" id="cdts-container">
+                <div class="col-12 text-center py-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Índices Bursátiles</h2>
+                <p>Principales índices de Estados Unidos</p>
+            </div>
+            <div class="row g-4" id="indices-container">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Cargando índices...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="noticias-section" class="section bg-light">
+        <div class="container">
+            <div class="section-header">
+                <h2>Noticias Relevantes</h2>
+                <p>Últimas noticias económicas de Colombia</p>
+            </div>
+            <div class="row g-4" id="noticias-container">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Cargando noticias...</p>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#news-history" onclick="loadNewsHistory()">
+                    <i class="bi bi-clock-history"></i> Ver historial de noticias (7 días)
+                </button>
+            </div>
+            <div class="collapse mt-3" id="news-history">
+                <div class="card card-body">
+                    <h5 class="mb-3">Historial de Noticias (últimos 7 días)</h5>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-4">
+                            <select class="form-select form-select-sm" id="filter-fuente" onchange="loadNewsHistory()">
+                                <option value="">Todas las fuentes</option>
+                                <option value="Bloomberg Línea">Bloomberg Línea</option>
+                                <option value="Portafolio">Portafolio</option>
+                                <option value="Valora Analitik">Valora Analitik</option>
+                                <option value="La República">La República</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="date" class="form-control form-control-sm" id="filter-fecha" onchange="loadNewsHistory()">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-sm btn-outline-secondary w-100" onclick="document.getElementById('filter-fuente').value='';document.getElementById('filter-fecha').value='';loadNewsHistory()">Limpiar</button>
+                        </div>
+                    </div>
+                    <div id="news-history-container"><p class="text-muted">Haga clic en "Ver historial" para cargar...</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="bi bi-graph-up-arrow"></i> Indicadores Macro Integrity CF</h5>
+                    <p class="mb-0">Datos obtenidos de fuentes oficiales: Banco de la República, DANE, Superfinanciera, Datos Abiertos Colombia, Yahoo Finance.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Fuentes</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://www.banrep.gov.co" target="_blank">Banrep</a></li>
+                        <li><a href="https://www.dane.gov.co" target="_blank">DANE</a></li>
+                        <li><a href="https://www.datos.gov.co" target="_blank">Datos Abiertos</a></li>
+                        <li><a href="https://www.superfinanciera.gov.co" target="_blank">Superfinanciera</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Documentación</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/api/datos">API Datos</a></li>
+                        <li><a href="#" id="download-excel-footer">Histórico Excel</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <p class="text-center mb-0">&copy; 2026 Integrity CF. Los datos son informativos y no constituyen asesoría financiera.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function fetchData() {
+            try {
+                const res = await fetch('/api/datos');
+                return await res.json();
+            } catch (e) {
+                console.error('Error fetching data:', e);
+                return null;
+            }
+        }
+
+        function getChangeBadge(change, changePct) {
+            if (change === undefined || change === null) return '';
+            const isPositive = change > 0;
+            const cls = isPositive ? 'bg-success' : 'bg-danger';
+            const icon = isPositive ? 'bi-arrow-up' : 'bi-arrow-down';
+            return `<span class="badge ${cls} ms-2"><i class="bi ${icon}"></i> ${Math.abs(change).toFixed(2)} (${Math.abs(changePct || 0).toFixed(2)}%)</span>`;
+        }
+
+        function renderVariables(data) {
+            const container = document.getElementById('variables-container');
+
+            if (data['ultima_actualizacion']) {
+                document.getElementById('last-update').textContent = data['ultima_actualizacion'];
+            }
+
+            const cards = [];
+
+            const varConfig = [
+                { key: 'trm', icon: 'bi-currency-exchange', title: 'TRM', subtitle: 'Tasa Representativa del Mercado', color: '#003366' },
+                { key: 'dollar_spot', icon: 'bi-currency-dollar', title: 'Dólar Spot', subtitle: 'USD/COP tiempo real', color: '#1abc9c' },
+                { key: 'brent_oil', icon: 'bi-fuel-pump', title: 'Petróleo Brent', subtitle: 'Precio del barril (LCOc1)', color: '#2c3e50' },
+                { key: 'dxy', icon: 'bi-currency-exchange', title: 'DXY', subtitle: 'Índice del Dólar Americano', color: '#27ae60' },
+                { key: 'political_rate', icon: 'bi-bank', title: 'Tasa de Política Monetaria', subtitle: 'Banco de la República', color: '#8e44ad' },
+                { key: 'ipc', icon: 'bi-graph-up', title: 'IPC', subtitle: 'Inflación anual - DANE', color: '#e67e22' },
+                { key: 'ibr', icon: 'bi-percent', title: 'IBR', subtitle: 'Indicador Bancario de Referencia', color: '#16a085' },
+                { key: 'pib', icon: 'bi-bar-chart', title: 'PIB Trimestral', subtitle: 'Crecimiento anual - DANE', color: '#2980b9' },
+            ];
+
+            for (const cfg of varConfig) {
+                const d = data[cfg.key];
+                if (!d) continue;
+                const val = d.valor !== undefined && d.valor !== null ? d.valor : '--';
+                const displayVal = typeof val === 'number' ? val.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : val;
+                const cambio = d.cambio !== undefined ? getChangeBadge(d.cambio, d.cambio_pct) : '';
+
+                if (cfg.key === 'trm' && typeof val === 'number') {
+                    document.getElementById('hero-trm').textContent = '$ ' + val.toLocaleString('es-CO', { minimumFractionDigits: 2 });
+                }
+
+                cards.push(`
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card variable-card h-100" style="border-top: 4px solid ${cfg.color}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <span class="variable-icon" style="color: ${cfg.color}"><i class="bi ${cfg.icon}"></i></span>
+                                        <h5 class="card-title mb-0">${cfg.title}</h5>
+                                    </div>
+                                </div>
+                                <p class="card-subtitle text-muted small mb-3">${cfg.subtitle}</p>
+                                <div class="variable-value">${displayVal}</div>
+                                <div class="variable-unit">${d.unidad || ''} ${cambio}</div>
+                                <small class="text-muted">${d.fuente || ''} · ${d.fecha || ''}</small>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            }
+
+            if (cards.length === 0) {
+                container.innerHTML = `<div class="col-12 text-center py-5"><h5 class="text-muted">No hay datos disponibles. <a href="#" onclick="refreshData()">Actualizar ahora</a></h5></div>`;
+            } else {
+                container.innerHTML = cards.join('');
+            }
+        }
+
+        function renderIBR(data) {
+            const container = document.getElementById('ibr-container');
+            const ibr = data['ibr'];
+            if (!ibr || !ibr.plazos || Object.keys(ibr.plazos).length === 0) {
+                container.innerHTML = `<div class="col-12"><div class="alert alert-info">Datos IBR no disponibles actualmente${ibr && ibr.nota ? ' — ' + ibr.nota : ''}</div></div>`;
+                return;
+            }
+            const plazoLabels = { 'overnight': 'Overnight', 'un_mes': '1 Mes', 'tres_meses': '3 Meses', 'seis_meses': '6 Meses', 'doce_meses': '12 Meses' };
+            let html = '';
+            for (const [plazoKey, plazoData] of Object.entries(ibr.plazos)) {
+                const banks = plazoData.cotizaciones || {};
+                const entries = Object.entries(banks);
+                if (entries.length === 0) continue;
+                html += `<div class="col-md-6 col-lg-4 mb-3"><div class="card h-100"><div class="card-header fw-bold">${plazoLabels[plazoKey] || plazoKey}</div><div class="card-body p-2"><table class="table table-sm table-borderless mb-0"><tbody>`;
+                for (const [bank, rate] of entries) {
+                    html += `<tr><td><small>${bank}</small></td><td class="text-end fw-semibold">${rate.toFixed(3)}%</td></tr>`;
+                }
+                html += `</tbody></table></div></div></div>`;
+            }
+            if (html) {
+                container.innerHTML = `<div class="row">${html}</div>`;
+                if (ibr.fecha) container.innerHTML += `<small class="text-muted">Fecha: ${ibr.fecha} · Fuente: ${ibr.fuente}</small>`;
+            } else {
+                container.innerHTML = `<div class="col-12"><div class="alert alert-info">No hay cotizaciones disponibles</div></div>`;
+            }
+        }
+
+        function renderTCO(data) {
+            const container = document.getElementById('tco-container');
+            const tco = data['tco'];
+            if (!tco || !tco.valores) {
+                container.innerHTML = `<div class="col-12"><div class="alert alert-info">Datos TCO no disponibles actualmente</div></div>`;
+                return;
+            }
+            const valores = tco.valores;
+            let html = '<div class="row">';
+            for (const moneda of ['pesos', 'uvr']) {
+                const items = valores[moneda];
+                if (!items || Object.keys(items).length === 0) continue;
+                html += `<div class="col-md-6"><div class="card mb-3"><div class="card-header fw-bold text-uppercase">${moneda}</div><div class="card-body p-2"><table class="table table-sm table-borderless mb-0"><tbody>`;
+                for (const [plazo, tasa] of Object.entries(items)) {
+                    const displayTasa = typeof tasa === 'number' ? tasa.toFixed(2) + '%' : tasa;
+                    html += `<tr><td>${plazo}</td><td class="text-end fw-semibold">${displayTasa}</td></tr>`;
+                }
+                html += `</tbody></table></div></div></div>`;
+            }
+            html += '</div>';
+            if (html.includes('card-header')) {
+                container.innerHTML = html;
+                if (tco.fecha) container.innerHTML += `<small class="text-muted">Fuente: ${tco.fuente} · ${tco.fecha}</small>`;
+            } else {
+                container.innerHTML = `<div class="col-12"><div class="alert alert-info">Datos TCO no disponibles actualmente</div></div>`;
+            }
+        }
+
+        function renderCDTs(data) {
+            const container = document.getElementById('cdts-container');
+            const cdts = data['cdts'];
+            if (!cdts || !cdts.valores || Object.keys(cdts.valores).length === 0) {
+                container.innerHTML = `<div class="col-12"><div class="alert alert-info">Datos CDTs no disponibles actualmente</div></div>`;
+                return;
+            }
+            const plazos = ['30d', '60d', '90d', '180d', '360d'];
+            const plazosLabel = {'30d':'30 días','60d':'60 días','90d':'90 días','180d':'180 días','360d':'360 días'};
+            let html = `<div class="table-responsive" style="max-height:500px;overflow-y:auto"><table class="table table-hover table-sm"><thead class="table-dark" style="position:sticky;top:0"><tr><th>Banco</th>`;
+            for (const p of plazos) html += `<th class="text-center">${plazosLabel[p]}</th>`;
+            html += '</tr></thead><tbody>';
+            for (const [bank, rates] of Object.entries(cdts.valores)) {
+                html += `<tr><td><strong>${bank}</strong></td>`;
+                for (const p of plazos) {
+                    const val = rates[p];
+                    html += `<td class="text-center">${val ? val.toFixed(2) + '%' : '--'}</td>`;
+                }
+                html += '</tr>';
+            }
+            html += '</tbody></table></div>';
+            if (cdts.unidad) html += `<small class="text-muted">Unidad: ${cdts.unidad} · Fuente: ${cdts.fuente}</small>`;
+            container.innerHTML = html;
+        }
+
+        async function renderNoticias(data) {
+            const container = document.getElementById('noticias-container');
+            try {
+                const res = await fetch('/api/noticias/historial');
+                const all = await res.json();
+                if (!all || all.length === 0) {
+                    container.innerHTML = `<div class="col-12"><div class="alert alert-info">No hay noticias disponibles</div></div>`;
+                    return;
+                }
+                const withImg = all.filter(n => n.imagen);
+                const withoutImg = all.filter(n => !n.imagen);
+                const display = [...withImg.slice(0, 6), ...withoutImg].slice(0, 6);
+                let html = '';
+                for (const n of display) {
+                    const img = n.imagen ? `<img src="${n.imagen}" class="card-img-top news-img" alt="" onerror="this.style.display='none'">` : '';
+                    const hora = n.hora ? `<small class="text-muted ms-2"><i class="bi bi-clock"></i> ${n.hora}</small>` : '';
+                    html += `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card news-card h-100">
+                                ${img}
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <span class="badge bg-secondary me-2">${n.fuente || ''}</span>
+                                        ${n.fecha ? `<small class="text-muted">${n.fecha}</small>` : ''}
+                                        ${hora}
+                                    </div>
+                                    <h6 class="card-title">${n.titulo}</h6>
+                                    <a href="${n.enlace}" target="_blank" class="stretched-link">Leer más <i class="bi bi-box-arrow-up-right small"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = `<div class="col-12"><div class="alert alert-info">Error al cargar noticias</div></div>`;
+            }
+        }
+
+        function renderIndices(data) {
+            const container = document.getElementById('indices-container');
+            const indices = data['indices'];
+            if (!indices || Object.keys(indices).length === 0) {
+                container.innerHTML = `<div class="col-12"><div class="alert alert-info">Índices no disponibles</div></div>`;
+                return;
+            }
+            const iconMap = { 'Dow Jones': 'bi-graph-up-arrow', 'Nasdaq 100': 'bi-cpu', 'S&P 500': 'bi-bar-chart-fill' };
+            const colorMap = { 'Dow Jones': '#003366', 'Nasdaq 100': '#2c3e50', 'S&P 500': '#27ae60' };
+            let html = '';
+            for (const [name, idx] of Object.entries(indices)) {
+                const val = idx.valor !== undefined ? idx.valor.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '--';
+                const cambio = idx.cambio !== undefined ? getChangeBadge(idx.cambio, idx.cambio_pct) : '';
+                html += `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card variable-card h-100" style="border-top: 4px solid ${colorMap[name] || '#003366'}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <span class="variable-icon" style="color: ${colorMap[name] || '#003366'}"><i class="bi ${iconMap[name] || 'bi-graph-up'}"></i></span>
+                                        <h5 class="card-title mb-0">${name}</h5>
+                                    </div>
+                                </div>
+                                <p class="card-subtitle text-muted small mb-3">${idx.subtitle || ''}</p>
+                                <div class="variable-value">${val}</div>
+                                <div class="variable-unit">${idx.unidad || ''} ${cambio}</div>
+                                <small class="text-muted">${idx.fuente || ''} · ${idx.fecha || ''}</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        async function loadNewsHistory() {
+            const container = document.getElementById('news-history-container');
+            container.dataset.loaded = '1';
+            container.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Cargando...</div>';
+            try {
+                const fuente = document.getElementById('filter-fuente').value;
+                const fecha = document.getElementById('filter-fecha').value;
+                let url = '/api/noticias/historial';
+                const params = [];
+                if (fuente) params.push('fuente=' + encodeURIComponent(fuente));
+                if (fecha) params.push('fecha=' + encodeURIComponent(fecha));
+                if (params.length) url += '?' + params.join('&');
+
+                const res = await fetch(url);
+                const items = await res.json();
+                if (!items || items.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No hay noticias que coincidan con los filtros.</p>';
+                    return;
+                }
+                let html = '<div class="list-group list-group-flush" style="max-height:400px;overflow-y:auto">';
+                for (const n of items) {
+                    const hora = n.hora ? ` ${n.hora}` : '';
+                    html += `<a href="${n.enlace}" target="_blank" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto"><div class="fw-bold">${n.titulo}</div>
+                        <small class="text-muted">${n.fuente || ''}${hora}</small></div>
+                        <span class="badge bg-secondary rounded-pill">${n.fecha || ''}</span>
+                    </a>`;
+                }
+                html += '</div>';
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = '<p class="text-danger">Error al cargar historial.</p>';
+            }
+        }
+
+        async function refreshData() {
+            try {
+                document.querySelectorAll('.spinner-border').forEach(s => s.style.display = 'inline-block');
+                const res = await fetch('/api/actualizar');
+                const data = await res.json();
+                if (data.data) {
+                    renderAll(data.data);
+                }
+            } catch (e) {
+                console.error('Error refreshing:', e);
+                alert('Error al actualizar datos. Intente de nuevo.');
+            }
+        }
+
+        async function renderAll(data) {
+            renderVariables(data);
+            renderIBR(data);
+            renderTCO(data);
+            renderCDTs(data);
+            renderIndices(data);
+            await renderNoticias(data);
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const data = await fetchData();
+            if (data) {
+                renderAll(data);
+            }
+        });
+
+        document.getElementById('download-excel')?.addEventListener('click', downloadExcel);
+        document.getElementById('download-excel-footer')?.addEventListener('click', downloadExcel);
+
+        function downloadExcel(e) {
+            e.preventDefault();
+            window.location.href = '/api/historico';
+        }
+
+        setInterval(async () => {
+            const data = await fetchData();
+            if (data) await renderAll(data);
+        }, 300000);
+    </script>
+</body>
+</html>

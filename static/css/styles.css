@@ -1,0 +1,208 @@
+:root {
+    --primary: #003366;
+    --primary-light: #004080;
+    --secondary: #f8f9fa;
+    --accent: #ffc107;
+    --text: #333;
+    --text-light: #6c757d;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+    color: var(--text);
+    background: #f5f6fa;
+}
+
+.navbar {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    padding: 0.8rem 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: -0.5px;
+}
+
+.navbar-brand i {
+    margin-right: 8px;
+    font-size: 1.4rem;
+}
+
+.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, #002244 100%);
+    color: white;
+    padding: 3rem 0 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    right: -50px;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 50%;
+}
+
+.hero h1 {
+    font-weight: 800;
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.hero .lead {
+    font-size: 1.1rem;
+    opacity: 0.85;
+    margin-bottom: 1.5rem;
+}
+
+.hero-stats {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.hero-stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+}
+
+.hero-stat-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.hero-icon {
+    font-size: 5rem;
+    opacity: 0.2;
+    line-height: 1;
+}
+
+.section {
+    padding: 3rem 0;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.section-header h2 {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 1.6rem;
+}
+
+.section-header p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+}
+
+.variable-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+}
+
+.variable-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.variable-icon {
+    font-size: 1.8rem;
+    margin-right: 10px;
+}
+
+.variable-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin: 0.3rem 0;
+}
+
+.variable-unit {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 0.3rem;
+}
+
+.news-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s;
+    overflow: hidden;
+}
+
+.news-card:hover {
+    transform: translateY(-2px);
+}
+
+.news-img {
+    height: 160px;
+    object-fit: cover;
+}
+
+.footer {
+    background: var(--primary);
+    color: rgba(255,255,255,0.85);
+    padding: 3rem 0 1.5rem;
+    margin-top: 2rem;
+}
+
+.footer h5 {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.footer a {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.footer a:hover {
+    color: white;
+}
+
+.footer hr {
+    border-color: rgba(255,255,255,0.1);
+    margin: 1.5rem 0;
+}
+
+.footer p {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.table-dark {
+    background: var(--primary);
+}
+
+.badge {
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+@media (max-width: 768px) {
+    .hero h1 { font-size: 1.6rem; }
+    .hero-stat-value { font-size: 1.1rem; }
+    .variable-value { font-size: 1.4rem; }
+}
