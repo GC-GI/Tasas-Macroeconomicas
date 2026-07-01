@@ -2,15 +2,29 @@ from flask import Flask, jsonify, render_template, request
 from scrapers import DataScrapers
 from db_manager import DBManager
 from apscheduler.schedulers.background import BackgroundScheduler
-from datetime import datetime
+from zoneinfo import ZoneInfo
 import atexit
 import logging
 import json
 import os
 import traceback
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+COL_TZ = ZoneInfo('America/Bogota')
+class ColombiaFormatter(logging.Formatter):
+    def converter(self, timestamp):
+        from datetime import datetime, timezone
+        return datetime.fromtimestamp(timestamp, tz=timezone.utc).astimezone(COL_TZ)
+    def formatTime(self, record, datefmt=None):
+        dt = self.converter(record.created)
+        return dt.strftime(datefmt or '%Y-%m-%d %H:%M:%S')
+
+handler = logging.StreamHandler()
+handler.setFormatter(ColombiaFormatter('%(asctime)s - %(levelname)s - %(message)s'))
 logger = logging.getLogger(__name__)
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+logger.propagate = False
+logging.getLogger('apscheduler').setLevel(logging.WARNING)
 
 app = Flask(__name__)
 cached_data = None

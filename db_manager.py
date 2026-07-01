@@ -1,7 +1,13 @@
 import os
 import json
 import logging
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
+from zoneinfo import ZoneInfo
+
+COL_TZ = ZoneInfo('America/Bogota')
+
+def _today():
+    return datetime.now(COL_TZ).date()
 
 try:
     import psycopg2
@@ -81,7 +87,7 @@ class DBManager:
     @staticmethod
     def save_data(variable, value, extra=None):
         DBManager.ensure_tables()
-        today_str = date.today().isoformat()
+        today_str = _today().isoformat()
         conn = DBManager._get_conn()
         cursor = conn.cursor()
         try:
@@ -132,7 +138,7 @@ class DBManager:
         if not news_list:
             return
         DBManager.ensure_tables()
-        today_str = date.today().isoformat()
+        today_str = _today().isoformat()
         conn = DBManager._get_conn()
         cursor = conn.cursor()
         try:
@@ -161,7 +167,7 @@ class DBManager:
         conn = DBManager._get_conn()
         cursor = conn.cursor()
         try:
-            cutoff = (date.today() - timedelta(days=7)).isoformat()
+            cutoff = (_today() - timedelta(days=7)).isoformat()
             params = [cutoff]
             sql = f'SELECT fecha, titulo, enlace, fuente, imagen, hora FROM {TBL_NOTICIAS} WHERE fecha >= %s'
             if fuente:
@@ -195,7 +201,7 @@ class DBManager:
     @staticmethod
     def end_of_day_cleanup():
         DBManager.ensure_tables()
-        today_str = date.today().isoformat()
+        today_str = _today().isoformat()
         conn = DBManager._get_conn()
         cursor = conn.cursor()
         try:
@@ -221,8 +227,8 @@ class DBManager:
         conn = DBManager._get_conn()
         cursor = conn.cursor()
         try:
-            indicadores_cutoff = (date.today() - timedelta(days=90)).isoformat()
-            noticias_cutoff = (date.today() - timedelta(days=7)).isoformat()
+            indicadores_cutoff = (_today() - timedelta(days=90)).isoformat()
+            noticias_cutoff = (_today() - timedelta(days=7)).isoformat()
             cursor.execute(f'DELETE FROM {TBL_INDICADORES} WHERE fecha < %s', (indicadores_cutoff,))
             cursor.execute(f'DELETE FROM {TBL_DETALLE} WHERE fecha < %s', (indicadores_cutoff,))
             cursor.execute(f'DELETE FROM {TBL_NOTICIAS} WHERE fecha < %s', (noticias_cutoff,))
