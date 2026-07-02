@@ -581,6 +581,103 @@ class DataScrapers:
         ]
 
     @staticmethod
+    def get_cartera_empresas():
+        try:
+            productos = {
+                'PYMES': 'CARTERA COMERCIAL PYMES',
+                'EMPRESARIAL': 'CARTERA COMERCIAL EMPRESARIAL',
+                'MICROEMPRESA': 'CARTERA COMERCIAL MICROEMPRESA',
+                'FACTORING': 'CARTERA COMERCIAL FACTOTING',
+            }
+            ucs = ','.join(f"'{v}'" for v in productos.values())
+            r = requests.get(
+                'https://www.datos.gov.co/resource/rvii-eis8.json',
+                params={
+                    '$where': f"descrip_uc in ({ucs}) AND renglon='5'",
+                    '$order': 'fecha_corte DESC',
+                    '$limit': 2000,
+                },
+                headers={**DataScrapers.HEADERS, 'Accept': 'application/json'},
+                timeout=30
+            )
+            r.raise_for_status()
+            rows = r.json()
+            if not rows:
+                return None
+            fechas = sorted(set(row['fecha_corte'][:7] for row in rows), reverse=True)
+            mes_reciente = fechas[0]
+            rows_mes = [row for row in rows if row['fecha_corte'].startswith(mes_reciente)]
+            totals = {}
+            for row in rows_mes:
+                prod = None
+                for k, v in productos.items():
+                    if row.get('descrip_uc') == v:
+                        prod = k
+                        break
+                if not prod:
+                    continue
+                def f(name):
+                    try:
+                        return float(row.get(name, 0) or 0)
+                    except (ValueError, TypeError):
+                        return 0.0
+                bruta = f('_1_saldo_de_la_cartera_a')
+                vigente = f('_2_vigente')
+                vencida_fields = [
+                    '_3_vencida_1_2_meses', '_4_vencida_2_3_meses', '_5_vencida_1_3_meses',
+                    '_6_vencida_3_4_meses', '_7_vencida_de_4_meses', '_8_vencida_3_6_meses',
+                    '_9_vencida_6_meses', '_10_vencida_1_4_meses', '_11_vencida_4_6_meses',
+                    '_12_vencida_6_12_meses', '_13_vencida_12_18_meses', '_14_vencida_12_meses',
+                    '_15_vencida_18_meses',
+                ]
+                mora = sum(f(fld) for fld in vencida_fields)
+                riesgo = f('_20_calificaci_n_de_riesgo') + f('_22_calificaci_n_de_riesgo') + f('_24_calificaci_n_de_riesgo') + f('_26_calificaci_n_de_riesgo')
+                if prod not in totals:
+                    totals[prod] = {'bruta': 0, 'vigente': 0, 'mora': 0, 'riesgo': 0}
+                totals[prod]['bruta'] += bruta
+                totals[prod]['vigente'] += vigente
+                totals[prod]['mora'] += mora
+                totals[prod]['riesgo'] += riesgo
+            result = []
+            for prod in ['PYMES', 'EMPRESARIAL', 'MICROEMPRESA', 'FACTORING']:
+                t = totals.get(prod)
+                if t and t['bruta'] > 0:
+                    icv = round((t['mora'] / t['bruta']) * 100, 2)
+                    icr = round((t['riesgo'] / t['bruta']) * 100, 2)
+                    result.append({
+                        'producto': prod,
+                        'bruta': round(t['bruta'], 0),
+                        'vigente': round(t['vigente'], 0),
+                        'mora': round(t['mora'], 0),
+                        'riesgo': round(t['riesgo'], 0),
+                        'icv': icv,
+                        'icr': icr,
+                    })
+            if not result:
+                return None
+            total_bruta = sum(x['bruta'] for x in result)
+            total_vigente = sum(x['vigente'] for x in result)
+            total_mora = sum(x['mora'] for x in result)
+            total_riesgo = sum(x['riesgo'] for x in result)
+            return {
+                'fecha': f'{mes_reciente}-01',
+                'productos': result,
+                'totales': {
+                    'bruta': total_bruta,
+                    'vigente': total_vigente,
+                    'mora': total_mora,
+                    'riesgo': total_riesgo,
+                    'icv': round((total_mora / total_bruta) * 100, 2) if total_bruta else 0,
+                    'icr': round((total_riesgo / total_bruta) * 100, 2) if total_bruta else 0,
+                },
+                'fuente': 'Datos Abiertos Colombia - Superfinanciera',
+                'unidad': 'COP',
+            }
+        except Exception as e:
+            logger.error(f"Cartera empresas error: {e}")
+        return None
+
+    @staticmethod
     def get_indices():
         result = {}
         indices = [
@@ -620,7 +717,7 @@ class DataScrapers:
     @staticmethod
     def get_all():
         results = {}
-        for fn in ['get_trm', 'get_dollar_spot', 'get_brent_oil', 'get_dxy', 'get_political_rate', 'get_ipc', 'get_ibr', 'get_pib', 'get_cdts', 'get_tco', 'get_indices', 'get_news']:
+        for fn in ['get_trm', 'get_dollar_spot', 'get_brent_oil', 'get_dxy', 'get_political_rate', 'get_ipc', 'get_ibr', 'get_pib', 'get_cdts', 'get_tco', 'get_cartera_empresas', 'get_indices', 'get_news']:
             try:
                 data = getattr(DataScrapers, fn)()
                 if data:

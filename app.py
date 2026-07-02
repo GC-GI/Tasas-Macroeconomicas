@@ -23,6 +23,14 @@ def save_all_data(data):
         if key in data:
             val = data[key].get('valor') if isinstance(data[key], dict) else None
             DBManager.save_data(key, val, data[key])
+    if 'cartera_empresas' in data and data['cartera_empresas']:
+        car = data['cartera_empresas']
+        DBManager.save_data('cartera_bruta', car['totales']['bruta'], {'unidad': 'COP', 'fuente': car['fuente']})
+        DBManager.save_data('cartera_vigente', car['totales']['vigente'], {'unidad': 'COP', 'fuente': car['fuente']})
+        DBManager.save_data('cartera_mora', car['totales']['mora'], {'unidad': 'COP', 'fuente': car['fuente']})
+        DBManager.save_data('cartera_riesgo', car['totales']['riesgo'], {'unidad': 'COP', 'fuente': car['fuente']})
+        DBManager.save_data('cartera_icv', car['totales']['icv'], {'unidad': '%', 'fuente': car['fuente']})
+        DBManager.save_data('cartera_icr', car['totales']['icr'], {'unidad': '%', 'fuente': car['fuente']})
     if 'indices' in data and data['indices']:
         for idx_name, idx_val in data['indices'].items():
             DBManager.save_data(idx_name, idx_val.get('valor'), idx_val)

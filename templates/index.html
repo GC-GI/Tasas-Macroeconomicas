@@ -126,6 +126,23 @@
     <section class="section">
         <div class="container">
             <div class="section-header">
+                <h2>Cartera de Empresas</h2>
+                <p>Saldo cartera comercial por producto (PYMES, Empresarial, Microempresarial, Factoring)</p>
+            </div>
+            <div id="cartera-container">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Cargando cartera...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
                 <h2>Índices Bursátiles</h2>
                 <p>Principales índices de Estados Unidos</p>
             </div>
@@ -411,6 +428,104 @@
             }
         }
 
+        function formatCOP(v) {
+            return '$' + Number(v).toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+
+        function renderCartera(data) {
+            const container = document.getElementById('cartera-container');
+            const car = data['cartera_empresas'];
+            if (!car || !car.productos || car.productos.length === 0) {
+                container.innerHTML = `<div class="alert alert-info">Datos de cartera no disponibles</div>`;
+                return;
+            }
+            const prodIcon = { 'PYMES': 'bi-building', 'EMPRESARIAL': 'bi-briefcase', 'MICROEMPRESA': 'bi-shop', 'FACTORING': 'bi-arrow-left-right' };
+            const prodColor = { 'PYMES': '#003366', 'EMPRESARIAL': '#2c3e50', 'MICROEMPRESA': '#27ae60', 'FACTORING': '#e67e22' };
+            const t = car.totales;
+            let html = `
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="card text-center p-3 h-100">
+                            <small class="text-muted">Cartera Bruta</small>
+                            <strong class="fs-5">${formatCOP(t.bruta)}</strong>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card text-center p-3 h-100">
+                            <small class="text-muted">Cartera Vigente</small>
+                            <strong class="fs-5">${formatCOP(t.vigente)}</strong>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card text-center p-3 h-100">
+                            <small class="text-muted">Cartera en Mora</small>
+                            <strong class="fs-5">${formatCOP(t.mora)}</strong>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card text-center p-3 h-100">
+                            <small class="text-muted">Saldo en Riesgo B-E</small>
+                            <strong class="fs-5">${formatCOP(t.riesgo)}</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6 col-md-3">
+                        <div class="card text-center p-3 h-100">
+                            <small class="text-muted">ICV</small>
+                            <strong class="fs-5">${t.icv.toFixed(2)}%</strong>
+                            <small class="text-muted">Cartera vencida / Bruta</small>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card text-center p-3 h-100">
+                            <small class="text-muted">ICR</small>
+                            <strong class="fs-5">${t.icr.toFixed(2)}%</strong>
+                            <small class="text-muted">Riesgo B-E / Bruta</small>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card text-center p-3 h-100">
+                            <small class="text-muted">Cobertura Mora</small>
+                            <strong class="fs-5">${(t.mora > 0 ? (t.riesgo / t.mora * 100).toFixed(2) : '0.00')}%</strong>
+                            <small class="text-muted">Riesgo / Mora</small>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card text-center p-3 h-100">
+                            <small class="text-muted">Fecha Corte</small>
+                            <strong class="fs-6">${car.fecha || '--'}</strong>
+                            <small class="text-muted">${car.fuente || ''}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-12"><h6 class="fw-bold">Desglose por Producto</h6></div>`;
+            for (const p of car.productos) {
+                html += `
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100" style="border-top: 4px solid ${prodColor[p.producto] || '#003366'}">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="me-2 fs-4" style="color:${prodColor[p.producto] || '#003366'}"><i class="bi ${prodIcon[p.producto] || 'bi-graph-up'}"></i></span>
+                                    <h6 class="card-title mb-0">${p.producto}</h6>
+                                </div>
+                                <table class="table table-sm small mb-0">
+                                    <tr><td>Bruta</td><td class="text-end">${formatCOP(p.bruta)}</td></tr>
+                                    <tr><td>Vigente</td><td class="text-end">${formatCOP(p.vigente)}</td></tr>
+                                    <tr><td>Mora</td><td class="text-end">${formatCOP(p.mora)}</td></tr>
+                                    <tr><td>Riesgo B-E</td><td class="text-end">${formatCOP(p.riesgo)}</td></tr>
+                                    <tr><td>ICV</td><td class="text-end">${p.icv.toFixed(2)}%</td></tr>
+                                    <tr><td>ICR</td><td class="text-end">${p.icr.toFixed(2)}%</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
         function renderIndices(data) {
             const container = document.getElementById('indices-container');
             const indices = data['indices'];
@@ -500,6 +615,7 @@
             renderIBR(data);
             renderTCO(data);
             renderCDTs(data);
+            renderCartera(data);
             renderIndices(data);
             await renderNoticias(data);
         }
