@@ -219,6 +219,25 @@ class DBManager:
             conn.close()
 
     @staticmethod
+    def get_variable_history(variable, days=90):
+        DBManager.ensure_tables()
+        conn = DBManager._get_conn()
+        cursor = conn.cursor()
+        try:
+            cutoff = (_today() - timedelta(days=days)).isoformat()
+            cursor.execute(
+                f'SELECT fecha, valor FROM {TBL_INDICADORES} WHERE variable = %s AND fecha >= %s AND valor IS NOT NULL ORDER BY fecha ASC',
+                (variable, cutoff)
+            )
+            rows = cursor.fetchall()
+            return [{'fecha': str(r[0]), 'valor': float(r[1])} for r in rows]
+        except Exception as e:
+            logger.error(f'Error reading history for {variable}: {e}')
+            return []
+        finally:
+            conn.close()
+
+    @staticmethod
     def purge_old_data():
         DBManager.ensure_tables()
         conn = DBManager._get_conn()

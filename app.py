@@ -104,6 +104,19 @@ def api_actualizar():
 def api_historico():
     return jsonify({'status': 'ok', 'message': 'Data stored in PostgreSQL. Use /api/datos for latest values.'})
 
+@app.route('/api/historial/indicador')
+def api_historial_indicador():
+    variable = request.args.get('variable', '')
+    days = request.args.get('dias', 90, type=int)
+    if not variable:
+        return jsonify({'status': 'error', 'message': 'Variable parameter required'})
+    items = DBManager.get_variable_history(variable, days=days)
+    return app.response_class(
+        response=json.dumps(items, ensure_ascii=False, indent=2, default=str),
+        status=200,
+        mimetype='application/json'
+    )
+
 @app.route('/api/noticias/historial')
 def api_noticias_historial():
     limit = request.args.get('limit', type=int)
